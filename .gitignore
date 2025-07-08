@@ -1,0 +1,9 @@
+model.py
+prepare.py
+train.bin
+val.bin
+.venv
+main.txt
+preapre.py
+requirements.txt
+completions.txt
