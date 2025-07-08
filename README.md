@@ -11,11 +11,14 @@ with open("input.txt", "r", encoding='utf-8') as f:
     text = f.read()
 
 vocab = sorted(list(set(text)))
+#character level encoding
 stoi = {c: i for i, c in enumerate(vocab)}
+#chacter level decoding
 iots = {i: c for i, c in enumerate(vocab)}
 ```
 
 ### 🔹 Explanation:
+
 - The dataset is a plain text file.
 - We create a character-level vocabulary and mapping functions:
   - `encode("hi") → [7, 10]`
@@ -27,12 +30,21 @@ iots = {i: c for i, c in enumerate(vocab)}
 
 ```python
 ctx_len = 128
-X_train = mx.array([train_data[i:i+ctx_len] for i in range(...)])
+#training data
+X_train = mx.array([train_data[i: i+ctx_len]
+                   for i in range(0, len(train_data) - ctx_len, ctx_len)])
+y_train = mx.array([train_data[i+1: i+ctx_len+1]
+                   for i in range(0, len(train_data) - ctx_len, ctx_len)])
 
-y_train = mx.array([train_data[i+1:i+ctx_len+1] for i in range(...)])
+#validation data
+X_val = mx.array([train_data[i: i+ctx_len]
+                 for i in range(0, len(val_data) - ctx_len, ctx_len)])
+y_val = mx.array([train_data[i+1: i + ctx_len+1]
+                 for i in range(0, len(val_data) - ctx_len, ctx_len)])
 ```
 
 ### 🔹 Explanation:
+
 - `ctx_len` is context length: how many tokens the model looks at.
 - The model is trained to predict the next character in a sequence.
 - Input: "The cat sa"
@@ -43,6 +55,10 @@ y_train = mx.array([train_data[i+1:i+ctx_len+1] for i in range(...)])
 ## 🧮 Model Components
 
 ### 🔹 Self-Attention Layer
+
+<p align="center">
+  <img src="./images/self-attention.png" alt="Self Attention"/>
+</p>
 
 ```python
 class Attention(nn.Module):
@@ -63,17 +79,21 @@ class Attention(nn.Module):
 **Key idea**: Let each token "look" at others to decide which are important.
 
 Example:
+
 > Token "cat" may attend more to "sat" than "the".
 
 ---
 
 ### 🔹 Multi-Head Attention
 
+<p align="center">
+  <img src="./images/mult-headed-attention.png" alt="Multi Headed Attention" style="width: 200px; height: auto;"/>
+</p>
+
 ```python
 class MultiHeadAttention(nn.Module):
     def __init__(self, n_heads, head_size):
         self.heads = [Attention(head_size) for _ in range(n_heads)]
-        self.proj = nn.Linear(n_heads * head_size, n_emb)
 ```
 
 **Why?** Multiple attention heads let the model learn different patterns (e.g., syntax vs. semantics).
@@ -86,7 +106,6 @@ class MultiHeadAttention(nn.Module):
 class Block(nn.Module):
     def __init__(self, ...):
         self.sa = MultiHeadAttention(...)
-        self.ffwd = FeedForward(...)
 ```
 
 Each block = self-attention + feed-forward + residual connections.
@@ -94,6 +113,10 @@ Each block = self-attention + feed-forward + residual connections.
 ---
 
 ## 🧠 Full Transformer Model
+
+<p align="center">
+  <img src="./images/transformer.png" alt="Transformer"/>
+</p>
 
 ```python
 class Transformer(nn.Module):
@@ -106,6 +129,7 @@ class Transformer(nn.Module):
 ```
 
 ### 🔹 Explanation:
+
 - `token_embedding` turns characters into vectors.
 - `pos_embedding` adds position info (i.e., token order).
 - Stack of blocks enables deep learning.
@@ -139,10 +163,10 @@ Output: `"he cat sa"` → `"he cat sat"`
 
 ## ✅ Summary
 
-| Component          | Purpose                              |
-|--------------------|--------------------------------------|
-| Embedding          | Convert characters to vectors        |
-| Self-Attention     | Learn which tokens to focus on       |
-| Positional Encoding| Preserve sequence order              |
-| Transformer Block  | Stack of attention + FF layers       |
-| Linear + Softmax   | Predict next character               |
+| Component           | Purpose                        |
+| ------------------- | ------------------------------ |
+| Embedding           | Convert characters to vectors  |
+| Self-Attention      | Learn which tokens to focus on |
+| Positional Encoding | Preserve sequence order        |
+| Transformer Block   | Stack of attention + FF layers |
+| Linear + Softmax    | Predict next character         |
