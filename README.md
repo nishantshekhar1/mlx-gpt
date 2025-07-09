@@ -105,7 +105,11 @@ class MultiHeadAttention(nn.Module):
 ```python
 class Block(nn.Module):
     def __init__(self, ...):
-        self.sa = MultiHeadAttention(...)
+        ...
+
+    def __call__(self, x):
+      x = x + self.mha(self.ln_1(x))
+      x = x + self.mlp(self.ln_2(x))
 ```
 
 Each block = self-attention + feed-forward + residual connections.
@@ -113,6 +117,8 @@ Each block = self-attention + feed-forward + residual connections.
 ---
 
 ## 🧠 Full Transformer Model
+
+- This is an edited version of original transformer presented in the **_Attention Is All You Need_** paper.
 
 <p align="center">
   <img src="./images/transformer.png" alt="Transformer"/>
