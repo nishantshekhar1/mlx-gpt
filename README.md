@@ -116,7 +116,7 @@ Each block = self-attention + feed-forward + residual connections.
 
 ---
 
-## 🧠 Full Transformer Model
+## 🧠 Full Transformer Model (Decoder-only)
 
 - This is an edited version of original transformer presented in the **_Attention Is All You Need_** paper.
 
